@@ -1,0 +1,30 @@
+.new-badge {
+      font-size: 0.75rem;
+      padding: 0.35em 0.65em;
+      vertical-align: middle;
+    }
+tr:hover { background-color: #f8f9fa; }
+.room-img-thumb {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+.btn-action {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+        }
+.table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+.table th, .table td {
+            vertical-align: middle;
+        }
+.container{
+    width: 80%;
+    padding: 0 50px;
+}

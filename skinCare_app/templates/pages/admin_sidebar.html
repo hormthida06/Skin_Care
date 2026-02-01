@@ -1,0 +1,113 @@
+{% load static %}
+
+<aside
+  :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"  style="height: 1500px;"
+  class="fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-teal-600 to-teal-800 text-white transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0"
+>
+  <div class="flex h-16 items-center justify-between px-6 border-b border-teal-700">
+    <h1 class="text-2xl font-bold tracking-wider">SkinCare Pro</h1>
+    <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden">
+      <i class="fas fa-times text-xl"></i>
+    </button>
+  </div>
+
+  <nav class="mt-8 px-4">
+    <ul class="space-y-2">
+<li>
+  <a href="/dashboard/"
+     class="flex items-center space-x-3 rounded-lg px-4 py-3 text-sm font-medium
+            {% if '/dashboard/' in request.path %}
+              bg-teal-700
+            {% else %}
+              hover:bg-teal-700
+            {% endif %}">
+    <i class="fas fa-tachometer-alt"></i>
+    <span>Dashboard</span>
+  </a>
+</li>
+
+<li>
+  <a href="/products/"
+     class="flex items-center space-x-3 rounded-lg px-4 py-3 text-sm font-medium
+            {%if '/products/' in request.path%}
+                bg-teal-700
+            {% else %}
+                hover:bg-teal-700
+            {% endif %}">
+    <i class="fas fa-box"></i>
+    <span>Products</span>
+  </a>
+</li>
+
+<li>
+  <a href="/categories/"
+     class="flex items-center space-x-3 rounded-lg px-4 py-3 text-sm font-medium
+            {% if '/categories/' in request.path %}
+              bg-teal-700
+            {% else %}
+              hover:bg-teal-700
+            {% endif %}">
+    <i class="fas fa-folder"></i>
+    <span>Category</span>
+  </a>
+</li>
+
+<li>
+  <a href="/orders/"
+     class="flex items-center space-x-3 rounded-lg px-4 py-3 text-sm font-medium
+            {% if '/orders/' in request.path %}
+              bg-teal-700
+            {% else %}
+              hover:bg-teal-700
+            {% endif %}">
+    <i class="fas fa-shopping-cart"></i>
+    <span>Orders</span>
+  </a>
+</li>
+
+<li>
+  <a href="/users/"
+     class="flex items-center space-x-3 rounded-lg px-4 py-3 text-sm font-medium
+            {% if '/users/' in request.path %}
+              bg-teal-700
+            {% else %}
+              hover:bg-teal-700
+            {% endif %}">
+    <i class="fas fa-users"></i>
+    <span>Customers</span>
+  </a>
+</li>
+
+<li>
+  <a href="/payments/"
+     class="flex items-center space-x-3 rounded-lg px-4 py-3 text-sm font-medium
+            {% if '/payments/' in request.path %}
+              bg-teal-700
+            {% else %}
+              hover:bg-teal-700
+            {% endif %}">
+    <i class="fas fa-dollar-sign"></i>
+    <span>Payment</span>
+  </a>
+</li>
+
+
+      <li>
+        <a href="#"
+           class="flex items-center space-x-3 rounded-lg px-4 py-3 hover:bg-teal-700 transition">
+          <i class="fas fa-percentage"></i>
+          <span>Promotions</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="#"
+           class="flex items-center space-x-3 rounded-lg px-4 py-3 hover:bg-teal-700 transition">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+</aside>

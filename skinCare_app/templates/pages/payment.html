@@ -1,0 +1,217 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GlowSkin - Checkout</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="{% static 'dist/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/checkOut.css' %}">
+</head>
+<body>
+  {% include "pages/nav.html" %}
+
+<div class="container checkout-container">
+
+  <div class="card">
+    <div class="header-pink text-center">
+      <h3 class="mb-0">Checkout - GlowSkin</h3>
+      <small>Your glowing skin ritual is almost complete ♡</small>
+    </div>
+
+    <div class="card-body p-4 p-md-5">
+
+      <div class="row">
+
+        <!-- Left: Order Summary -->
+        <div class="col-lg-5 mb-4 mb-lg-0">
+          <h5 class="mb-3 fw-bold">Order Summary</h5>
+
+            {% for item in order_items %}
+                <div class="order-item d-flex justify-content-between">
+                  <span>{{ item.product.product_name }} × {{ item.quantity }}</span>
+                  <span>${{ item.subtotal|floatformat:2 }}</span>
+                </div>
+            {% empty %}
+                <p>No items in this order.</p>
+            {% endfor %}
+
+          <hr class="my-3">
+
+          <div class="order-item d-flex justify-content-between fw-bold">
+            <span>Subtotal</span>
+            <span>${{ order.total_amount|floatformat:2 }}</span>
+          </div>
+
+          <div class="d-flex justify-content-between">
+             <span>Tax (10%):</span>
+             <span>${{ tax|floatformat:2 }}</span>
+          </div>
+
+          <div class="order-item d-flex justify-content-between">
+            <span>Delivery</span>
+            <span>$2.50</span>
+          </div>
+
+          <div class="order-item d-flex justify-content-between fw-bold mt-2">
+            <span>Total</span>
+            <span>${{ total_amount|floatformat:2 }}</span>
+          </div>
+
+  <hr class="my-4">
+
+  <h6 class="mb-3">Delivery To</h6>
+  <p class="mb-1">{{ order.user.userprofile.full_name }}</p>
+  <p class="mb-1">{{ order.user.userprofile.address }}</p>
+  <p class="small text-muted">{{ order.user.userprofile.phone }}</p>
+</div>
+
+        <!-- Right: Payment - KHQR -->
+        <div class="col-lg-7">
+          <h5 class="mb-3 fw-bold">Pay with KHQR</h5>
+          <p class="text-muted mb-4">
+            Open your banking app (ACLEDA, ABA, Wing, Pi Pay, Bakong, etc.) → Scan QR → Confirm payment.<br>
+            <strong>One QR works with all Bakong member apps!</strong>
+          </p>
+
+          <div class="qr-box">
+            <img id="qrImage" src="{{ qr_url }}" alt="KHQR Payment QR">
+
+                  <p class="mt-3 mb-2 fw-bold">
+                        Amount to Pay: <span class="timer" id="qrAmount">${{ total_amount|floatformat:2 }}</span>
+                  </p>
+
+            <!-- For dynamic QR: show countdown (5-10 minutes validity) -->
+            <p class="small text-muted">
+              This QR is valid for <span class="timer" id="countdown">10:00</span> minutes
+            </p>
+
+            <button class="btn btn-outline-secondary btn-sm mt-2" onclick="refreshQR()">
+              Refresh QR
+            </button>
+          </div>
+
+          <div class="text-center mt-4">
+{#            <button class="btn btn-pay-confirm text-white px-5" onclick="confirmPayment()">#}
+{#              I've Completed Payment#}
+{#            </button>#}
+            <p class="small text-muted mt-3">
+              After payment, click above. We'll verify within seconds.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card-footer text-center py-3 bg-light border-0">
+      <small class="text-muted">Secured by KHQR • Bakong Payment System</small>
+    </div>
+  </div>
+
+</div>
+    <footer class="text-center py-4 mt-5 small-muted">© 2025 SkinShine — Demo Store</footer>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+<script>
+let countdownTime = 10 * 60;
+let countdownInterval;
+let checkPaymentInterval;
+let currentMD5 = "";
+
+// Countdown timer
+function updateCountdown() {
+    const minutes = String(Math.floor(countdownTime / 60)).padStart(2,'0');
+    const seconds = String(countdownTime % 60).padStart(2,'0');
+    document.getElementById("countdown").innerText = `${minutes}:${seconds}`;
+    countdownTime--;
+
+    if (countdownTime < 0) {
+        clearInterval(countdownInterval);
+        alert("QR expired! Refresh QR.");
+    }
+}
+
+// Generate KHQR
+function fetchKHQR() {
+    fetch("{% url 'generate_khqr' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("QR Response:", data);
+
+        const qrImage = document.getElementById("qrImage");
+        qrImage.src = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data="
+                        + encodeURIComponent(data.qrData);
+
+        document.getElementById("qrAmount").innerText = "$" + parseFloat(data.total).toFixed(2);
+
+        currentMD5 = data.md5;
+        console.log("MD5:", currentMD5);
+
+        countdownTime = 10 * 60;
+        clearInterval(countdownInterval);
+        countdownInterval = setInterval(updateCountdown, 1000);
+
+        startPaymentPolling();
+    })
+    .catch(err => {
+        console.error("QR ERROR:", err);
+        alert("Failed to generate QR");
+    });
+}
+
+function refreshQR() {
+    fetchKHQR();
+}
+
+function startPaymentPolling() {
+    if (checkPaymentInterval) clearInterval(checkPaymentInterval);
+
+    checkPaymentInterval = setInterval(() => {
+        if (!currentMD5) {
+            console.log(" No MD5 yet");
+            return;
+        }
+
+        fetch(`/check-transaction-status/?md5=${currentMD5}`, { cache: "no-store" })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Payment Check:", data);
+
+            if (data.paid) {
+                clearInterval(checkPaymentInterval);
+                clearInterval(countdownInterval);
+                alert("Payment Successful!");
+                send_telegram_order_paid(order)
+                window.location.href = data.redirect;
+            }
+            else if (data.pending) {
+                console.log(" Waiting for payment...");
+            }
+            else if (data.error) {
+                console.error(" Error:", data.error);
+                clearInterval(checkPaymentInterval);
+            }
+        })
+        .catch(err => console.error("Polling error:", err));
+    }, 2000);
+}
+
+
+fetchKHQR();
+</script>
+
+</body>
+</html>

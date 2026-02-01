@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GlowSkin - Checkout - Customer Information</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+        crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'dist/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'dist/css/detail.css' %}">
+
+</head>
+<body>
+
+{% include "pages/nav.html" %}
+
+<div class="container checkout-container">
+
+  <div class="card">
+    <div class="header-pink">
+      <h3 class="mb-1">Customer Information</h3>
+      <p class="mb-0">Please fill in your details for delivery</p>
+    </div>
+
+    <div class="card-body p-4 p-md-5">
+{#<ul>#}
+{#  {% for item in cart_items %}#}
+{#    <li>{{ item.product.product_name }} × {{ item.quantity }} — ${{ item.subtotal }}</li>#}
+{#  {% empty %}#}
+{#    <li>Your cart is empty.</li>#}
+{#  {% endfor %}#}
+{#</ul>#}
+      <form id="customerInfoForm" method="POST" action="{% url 'save_checkout' %}">
+        {% csrf_token %}
+                <input type="hidden" name="selected_items" id="selectedItemsInput"
+           value='{{ selected_items_json|safe }}'>
+        <!-- Personal Information -->
+        <div class="form-section-title">Personal Details</div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="fullName" class="form-label">Full Name *</label>
+            <input type="text" name="full_name" value="{{ username }}" placeholder="Full Name" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label for="phone" class="form-label">Phone Number *</label>
+            <input type="tel" name="phone" value="{{ phone }}" placeholder="+855 -- --- ---" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-1">
+          <div class="col-12">
+            <label for="email" class="form-label">Email Address *</label>
+             <input type="email" name="email" value="{{ email }}" placeholder="user@example.com" class="form-control" id="email" required>
+          </div>
+        </div>
+
+        <!-- Delivery Address -->
+        <div class="form-section-title">Delivery Address</div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="commune" class="form-label">Address</label>
+            <input type="text" name="address" id="address" placeholder="enter your current address" class="form-control" required>
+          </div>
+        </div>
+
+        <!-- Additional Notes -->
+        <div class="form-section-title">Additional Information</div>
+
+        <div class="mb-3">
+          <label for="notes" class="form-label">Order Notes (optional)</label>
+          <textarea class="form-control" id="notes" rows="3"
+                    placeholder="e.g. Please leave package at security guard / call me before delivery"></textarea>
+        </div>
+
+        <div class="form-check mb-4">
+          <input class="form-check-input" type="checkbox" id="saveInfo" checked>
+          <label class="form-check-label" for="saveInfo">
+            Save this information for next time
+          </label>
+        </div>
+
+        <div class="text-center mt-5">
+          <button type="submit" class="btn btn-primary btn-lg px-5">Continue to Payment</button>
+          <p class="mt-3 small text-muted note">
+            You will be redirected to KHQR payment after submitting this form
+          </p>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+
+<footer class="text-center py-4 mt-5 small-muted">© 2025 SkinShine — Demo Store</footer>
+<!-- Bootstrap JS -->
+<script>
+document.querySelector("form").addEventListener("submit", function () {
+
+    let selected = [];
+
+    document.querySelectorAll("#cart-items .cart-item").forEach(item => {
+        let checkbox = item.querySelector(".item-check");
+
+        if (checkbox.checked) {
+            let id = item.dataset.itemId;
+            let qty = item.querySelector(".quantity-input").value;
+
+            selected.push({id: id, qty: qty});
+        }
+    });
+
+    console.log("Selected Items:", selected);
+
+    document.getElementById("selected_items_input").value = JSON.stringify(selected);
+});
+
+
+document.getElementById("customerInfoForm").addEventListener("submit", function(e) {
+    const selectedItemsInput = document.getElementById("selectedItemsInput");
+    const selectedItems = JSON.parse(selectedItemsInput.value || "{}");
+
+    if (Object.keys(selectedItems).length === 0) {
+        alert("Your cart is empty!");
+        e.preventDefault();
+        return;
+    }
+
+    // We can update the hidden input if user changes quantities on this page
+    // (optional, if you allow quantity editing)
+});
+
+
+
+</script>
+
+</body>
+</html>

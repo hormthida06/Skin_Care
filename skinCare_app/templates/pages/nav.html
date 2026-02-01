@@ -1,0 +1,72 @@
+{% load static %}
+<nav class="navbar navbar-light bg-white shadow-sm sticky-top">
+      <div class="container d-flex align-items-center justify-content-between">
+
+        <!-- Brand -->
+        <a class="navbar-brand d-flex align-items-center" href="/">
+          <div class="rounded-circle text-white d-flex align-items-center justify-content-center"
+              style="width:44px;height:44px;background:#f14c7e;font-weight:700">
+            SK
+          </div>
+          <div class="ms-2">
+            <div class="fw-bold">SkinShine</div>
+            <div class="small-muted">Korean · Japanese · Natural</div>
+          </div>
+        </a>
+
+        <!-- Search -->
+        <form class="d-flex flex-grow-1 mx-4" role="search" onsubmit="return false;">
+          <input id="searchInput" class="form-control" type="search"
+                placeholder="Search products, brand, concern..."
+                aria-label="Search">
+        </form>
+
+        <!-- Right Menu -->
+
+        <div class="d-flex align-items-center gap-3">
+
+            {% if request.session.user_id %}
+                {% if request.session.role == 'customer' %}
+                    <a href="#" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                        <i class="bi bi-person-circle"></i>
+                        {{ request.session.user_name }}
+                    </a>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-pink" style="color:white; margin:0 10px">
+                    Login / Sign Up
+                </a>
+            {% endif %}
+
+            <!-- Cart -->
+            {% comment %} Dynamically get total items in cart {% endcomment %}
+           {% if request.session.user_id %}
+                <button class="btn btn-pink position-relative"
+                        data-bs-toggle="offcanvas" data-bs-target="#cartPanel"
+                        style="color: white;">
+                    Cart
+                    <span id="cart-count"
+                          class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">
+                      {{ cart_total_items }}
+                    </span>
+                </button>
+            {% else %}
+                <button class="btn btn-pink position-relative"
+                        data-bs-toggle="offcanvas" data-bs-target="#cartPanel"
+                        style="color: white;">
+                    Cart
+                    <span id="cart-count" class="badge bg-danger">{{ cart_total_items }}</span>
+
+{#                    <span id="cart-count"#}
+{#                          class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">#}
+{#                      0#}
+{#                    </span>#}
+                </button>
+            {% endif %}
+
+        </div>
+
+
+      </div>
+    </nav>

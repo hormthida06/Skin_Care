@@ -1,0 +1,131 @@
+{% load static %}
+<main class="flex-1 p-6">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-500">Total Revenue</p>
+                <p class="text-2xl font-bold text-gray-800">$48,574</p>
+                <p class="text-xs text-green-600 mt-1">+12.5% from last month</p>
+              </div>
+              <i class="fas fa-dollar-sign text-4xl text-teal-600 opacity-20"></i>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-500">Total Orders</p>
+                <p class="text-2xl font-bold text-gray-800">1,423</p>
+                <p class="text-xs text-green-600 mt-1">+8.2% from last month</p>
+              </div>
+              <i class="fas fa-shopping-bag text-4xl text-teal-600 opacity-20"></i>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-500">New Customers</p>
+                <p class="text-2xl font-bold text-gray-800">284</p>
+                <p class="text-xs text-red-600 mt-1">-3.1% from last month</p>
+              </div>
+              <i class="fas fa-users text-4xl text-teal-600 opacity-20"></i>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-sm text-gray-500">Products in Stock</p>
+                <p class="text-2xl font-bold text-gray-800">89</p>
+                <p class="text-xs text-orange-600 mt-1">12 low stock</p>
+              </div>
+              <i class="fas fa-box-open text-4xl text-teal-600 opacity-20"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Orders & Top Products -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Recent Orders -->
+          <div class="lg:col-span-2 bg-white rounded-xl shadow border border-gray-100">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 class="text-lg font-semibold text-gray-800">Recent Orders</h3>
+              <a href="#" class="text-sm text-teal-600 hover:underline">View all →</a>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm text-left">
+                <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                  <tr>
+                    <th class="px-6 py-3">Order ID</th>
+                    <th class="px-6 py-3">Customer</th>
+                    <th class="px-6 py-3">Total</th>
+                    <th class="px-6 py-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4">#1001</td>
+                    <td class="px-6 py-4">Sarah Miller</td>
+                    <td class="px-6 py-4">$89.00</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Delivered</span></td>
+                  </tr>
+                  <tr class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4">#1002</td>
+                    <td class="px-6 py-4">James Lee</td>
+                    <td class="px-6 py-4">$156.50</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Processing</span></td>
+                  </tr>
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4">#1003</td>
+                    <td class="px-6 py-4">Olivia Chen</td>
+                    <td class="px-6 py-4">$74.99</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">Shipped</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Top Selling Products -->
+          <div class="bg-white rounded-xl shadow border border-gray-100">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-800">Top Products</h3>
+            </div>
+            <ul class="p-6 space-y-4">
+              <li class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                  <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12"></div>
+                  <div>
+                    <p class="font-medium">Hydrating Serum</p>
+                    <p class="text-xs text-gray-500">342 sales</p>
+                  </div>
+                </div>
+                <span class="text-teal-600 font-semibold">$68</span>
+              </li>
+              <li class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                  <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12"></div>
+                  <div>
+                    <p class="font-medium">Vitamin C Cream</p>
+                    <p class="text-xs text-gray-500">289 sales</p>
+                  </div>
+                </div>
+                <span class="text-teal-600 font-semibold">$54</span>
+              </li>
+              <li class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                  <div class="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12"></div>
+                  <div>
+                    <p class="font-medium">Retinol Night Moisturizer</p>
+                    <p class="text-xs text-gray-500">256 sales</p>
+                  </div>
+                </div>
+                <span class="text-teal-600 font-semibold">$92</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </main>

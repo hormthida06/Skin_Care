@@ -1,0 +1,225 @@
+{% load static %}
+<div class="offcanvas offcanvas-end" tabindex="-1" id="cartPanel">
+  <div class="offcanvas-header">
+    <h5>My Cart (<span id="cart-total-items">{{ cart_total_items }}</span> items)</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+      <input type="checkbox" class="form-check-input me-2" id="select-all" checked>
+      <label class="form-check-label fw-bold" for="select-all">Select All Items</label>
+    </div>
+
+    <div id="cart-items">
+      {% for item in cart_items %}
+        <div class="d-flex align-items-center mb-2 cart-item"
+             data-item-id="{{ item.id }}"
+             data-unit-price="{{ item.product.price }}">
+
+          <input type="checkbox" class="form-check-input me-2 item-check" checked>
+
+          <img src="{% if item.product.image_url %}/media/{{ item.product.image_url }}{% else %}{% static 'placeholder.png' %}{% endif %}"
+               width="50" height="50" class="me-2 rounded">
+
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between">
+                <div class="product-name">{{ item.product.product_name }}</div>
+                <h6 class="text-primary item-total-price">$ {{ item.subtotal|floatformat:2 }}</h6>
+            </div>
+
+            <div class="d-flex align-items-center">
+              <button class="btn btn-sm btn-outline-secondary minus-btn">-</button>
+              <input type="number" class="form-control form-control-sm quantity-input" value="{{ item.quantity }}" style="width:60px">
+              <button class="btn btn-sm btn-outline-secondary plus-btn">+</button>
+            </div>
+
+            <div>Subtotal: $<span class="item-subtotal">{{ item.subtotal }}</span></div>
+          </div>
+
+          <a href="{% url 'remove_cart_item' item.id %}" class="btn btn-sm btn-outline-danger">Remove</a>
+        </div>
+        <hr>
+
+
+          <hr>
+      {% empty %}
+        <p class="text-muted">Your cart is empty.</p>
+      {% endfor %}
+    </div>
+
+      <div class="checkout-summary bg-light p-3 rounded mt-3">
+        <h5 style="font-size: 16px">Checkout Summary (Selected Items Only)</h5>
+        <ul class="list-unstyled" id="checkout-summary-list"></ul>
+
+    </div>
+
+    <!-- Totals -->
+    <hr class="my-4">
+    <div class="bg-light p-3 rounded">
+      <div class="d-flex justify-content-between"><span>Subtotal:</span> <strong id="cart-subtotal">{{ cart_total_price }}</strong></div>
+      <div class="d-flex justify-content-between"><span>Items:</span> <strong id="cart-total-items">{{ cart_total_items }}</strong></div>
+      <div class="d-flex justify-content-between"><span>Tax (10%):</span> <strong id="tax">{{ cart_tax }}</strong></div>
+      <div class="d-flex justify-content-between"><span>Delivery:</span> <strong>$2.50</strong></div>
+        <hr>
+      <div class="d-flex justify-content-between fs-5 text-primary fw-bold">
+        <span>Total:</span> <strong id="checkout-total"> ${{ cart_total_price|add:"2.50"|floatformat:2 }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="offcanvas-footer p-3 border-top bg-white">
+    <form id="checkout-form" method="POST" action="{% url 'detail' %}">
+      {% csrf_token %}
+      <input type="hidden" name="selected_items" id="selectedItemsInput">
+      <button type="submit" class="btn btn-success w-100 fw-bold" id="checkout-btn">
+          Checkout Selected (<span id="selected-count">{{ cart_total_items }}</span>)
+      </button>
+    </form>
+
+{#        <button class="btn btn-success w-100 fw-bold" id="checkout-btn">#}
+{#          Checkout Selected (<span id="selected-count">{{ cart_total_items }}</span>)#}
+{#        </button>#}
+  </div>
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const cartPanel = document.getElementById("cartPanel");
+
+    cartPanel.querySelectorAll(".plus-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const item = btn.closest(".cart-item");
+            const input = item.querySelector(".quantity-input");
+            input.value = parseInt(input.value) + 1;
+            updateCartItem(item, input.value);
+        });
+    });
+
+    cartPanel.querySelectorAll(".minus-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const item = btn.closest(".cart-item");
+            const input = item.querySelector(".quantity-input");
+            if (input.value > 1) {
+                input.value = parseInt(input.value) - 1;
+                updateCartItem(item, input.value);
+            }
+        });
+    });
+
+    cartPanel.querySelectorAll(".quantity-input").forEach(input => {
+        input.addEventListener("input", () => {
+            const item = input.closest(".cart-item");
+            updateCartItem(item, input.value);
+        });
+    });
+
+    document.getElementById("select-all").addEventListener("change", function () {
+        document.querySelectorAll(".item-check").forEach(cb => cb.checked = this.checked);
+        updateCartTotals();
+    });
+
+    document.querySelectorAll(".item-check").forEach(cb => {
+        cb.addEventListener("change", updateCartTotals);
+    });
+
+    updateCartTotals();
+});
+
+function updateCartItem(itemDiv, quantity) {
+    fetch("{% url 'update_cart_item' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({
+            item_id: itemDiv.dataset.itemId,
+            quantity: parseInt(quantity)
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            itemDiv.dataset.unitPrice = data.unit_price;
+            itemDiv.querySelector(".item-subtotal").innerText = data.subtotal.toFixed(2);
+            itemDiv.querySelector(".item-total-price").innerText = "$ " + data.subtotal.toFixed(2);
+            updateCartTotals();
+        }
+    });
+}
+
+function updateCartTotals() {
+    let subtotal = 0;
+    let items = 0;
+    let taxRate = 0.10;
+    let delivery = 2.50;
+
+    const summaryList = document.getElementById("checkout-summary-list");
+    summaryList.innerHTML = "";
+
+    document.querySelectorAll(".cart-item").forEach(item => {
+        const checked = item.querySelector(".item-check").checked;
+        const qty = parseInt(item.querySelector(".quantity-input").value) || 0;
+        const unitPrice = parseFloat(item.dataset.unitPrice) || 0;
+        const name = item.querySelector(".product-name").innerText;
+
+        if (checked) {
+            let itemTotal = qty * unitPrice;
+            subtotal += itemTotal;
+            items += qty;
+
+            // summary line
+            const li = document.createElement("li");
+            li.className = "d-flex justify-content-between mb-1";
+            li.innerHTML = `<span>${name} × ${qty}</span><span>$${itemTotal.toFixed(2)}</span>`;
+            summaryList.appendChild(li);
+        }
+    });
+
+    let tax = subtotal * taxRate;
+    let total = subtotal + tax + delivery;
+
+    document.getElementById("cart-subtotal").innerText = "$" + subtotal.toFixed(2);
+    document.getElementById("selected-count").innerText = items;
+    document.getElementById("tax").innerText = "$" + tax.toFixed(2);
+    document.getElementById("checkout-total").innerText = "$" + total.toFixed(2);
+    document.getElementById("cart-total").innerText = "$" + total.toFixed(2);
+}
+
+document.getElementById("customerInfoForm").addEventListener("submit", function(e) {
+    let selectedItems = {};
+
+    document.querySelectorAll(".cart-item").forEach(item => {
+        const checkbox = item.querySelector(".item-check");
+        if (checkbox.checked) {
+            const productId = item.dataset.itemId;
+            const qty = parseInt(item.querySelector(".quantity-input").value) || 1;
+            selectedItems[productId] = qty;
+        }
+    });
+
+    console.log("Selected items (JS):", selectedItems);
+
+    if (Object.keys(selectedItems).length === 0) {
+        alert("Your cart is empty!");
+        e.preventDefault();
+        return;
+    }
+
+    document.getElementById("selectedItemsInput").value = JSON.stringify(selectedItems);
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const selectedItemsInput = document.getElementById("selectedItemsInput");
+
+    let selectedItems = JSON.parse(document.getElementById("selected-items").textContent);
+
+    console.log("Selected items from Django:", selectedItems);
+});
+
+
+</script>
+
+

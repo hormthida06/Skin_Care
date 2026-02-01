@@ -1,0 +1,86 @@
+{% load static %}
+
+<div class="modal fade" id="checkoutModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">Checkout - Selected Items Only</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="row g-4">
+              <!-- Left Column: Customer Info + Summary -->
+              <div class="col-md-6">
+                <h6 class="fw-bold mb-3">Customer Information</h6>
+                <div id="checkout-user" class="bg-light p-3 rounded mb-4"></div>
+
+                <h6 class="fw-bold mb-3">Order Summary</h6>
+                <ul id="checkout-list" class="list-unstyled mb-3 small"></ul>
+
+                <div class="bg-light p-3 rounded">
+                  <div class="d-flex justify-content-between"><span>Subtotal:</span> <strong id="subtotal">$0.00</strong></div>
+                  <div class="d-flex justify-content-between"><span>Tax (10%):</span> <strong id="tax">$0.00</strong></div>
+                  <div class="d-flex justify-content-between"><span>Delivery:</span> <strong id="delivery">$2.50</strong></div>
+                  <hr class="my-2">
+                  <div class="d-flex justify-content-between fs-5 text-primary fw-bold">
+                    <span>Total:</span> <strong id="total">$0.00</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: KHQR Payment -->
+              <div class="col-md-6">
+                <h6 class="fw-bold mb-3">KHQR Payment</h6>
+                <div id="khqr-box" class="khqr-box text-center border rounded p-4 bg-light" style=" min-height: 220px;">
+                    <p class="text-muted mb-0">Click below to generate your payment QR code</p>
+                </div>
+                <button class="btn btn-primary w-100 mt-3" onclick="generateKHQR()">
+                    Generate KHQR Code
+                </button>
+            </div>
+
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+
+            <button class="btn btn-success" onclick="checkoutNow()">
+              Confirm Payment
+            </button>
+
+              <script>
+                function checkoutNow() {
+                  const payload = {
+                    user: currentUser,
+                    items: cart.filter(i => i.checked).map(i => {
+                      const p = PRODUCTS.find(x => x.id === i.id);
+                      return { name: p.name, qty: i.qty };
+                    }),
+                    total: document.getElementById("total").textContent
+                  };
+
+                  fetch("/checkout/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                  })
+                  .then(res => res.json())
+                  .then(data => {
+                    console.log(data);
+                    alert("✅ Order sent to Telegram!");
+                  })
+                  .catch(err => {
+                    console.error(err);
+                    alert("❌ Checkout failed");
+                  });
+                }
+                </script>
+
+
+          </div>
+        </div>
+      </div>
+    </div>

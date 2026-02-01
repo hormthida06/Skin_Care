@@ -1,0 +1,13 @@
+
+      .product-card { transition: box-shadow .15s ease; }
+      .product-card:hover { box-shadow: 0 6px 18px rgba(0,0,0,.08); }
+      .badge-shop { background: #ff6b95; }
+      .offcanvas-cart { width: 420px; }
+      .truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .price { font-weight: 700; }
+      .small-muted { font-size: .85rem; color: #6b7280; }
+      .btn-pink { background:#f14c7e; border:none;color: white; }
+      .btn-pink:hover { background:#e91e63; color: white; }
+      .btn-concern.active { background:#f14c7e; color:white; border-color:#f14c7e; }
+      .btn-outline-pink {border: 1px solid #f14c7e;color: #f14c7e;background: transparent;}
+      .btn-outline-pink:hover {background-color: #e91e63;color: white;}
